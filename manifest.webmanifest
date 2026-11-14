@@ -1,0 +1,17 @@
+{
+  "name": "MEIMO 肉欲启动舱",
+  "short_name": "MEIMO舱",
+  "description": "Meimo 镜像启动舱（含本机账号保险柜）",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#08000a",
+  "theme_color": "#09000a",
+  "lang": "zh-CN",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

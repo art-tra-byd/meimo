@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#09000a" />
+<title>♠ MEIMO 肉欲启动舱</title>
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" type="image/png" href="icon-192.png" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<style>
+  :root {
+    --pink: #ff1a5c;
+    --pink2: #ff7ab0;
+    --gold: #f0c36a;
+    --spade: #c9a6ff;
+    --text: #ffe9f2;
+    --muted: #c49aab;
+    --line: rgba(255, 50, 110, 0.35);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    min-height: 100%;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background:
+      radial-gradient(800px 480px at 20% -10%, rgba(255, 20, 80, .42), transparent 55%),
+      radial-gradient(600px 400px at 100% 0%, rgba(150, 60, 255, .25), transparent 50%),
+      #08000a;
+    overflow-x: hidden;
+  }
+  body { padding: 0 0 calc(20px + var(--safe-b)); }
+
+  /* ===== SPLASH ===== */
+  #splash {
+    position: fixed; inset: 0; z-index: 9999;
+    background:
+      radial-gradient(ellipse at center, #2a0018 0%, #0a0008 65%, #000 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 24px 18px;
+    transition: opacity .7s ease, visibility .7s;
+  }
+  #splash.hide {
+    opacity: 0; visibility: hidden; pointer-events: none;
+  }
+  .sp-spade {
+    font-size: 52px;
+    animation: throb 1.1s ease-in-out infinite;
+    text-shadow: 0 0 24px rgba(255, 40, 100, .8);
+  }
+  @keyframes throb {
+    0%, 100% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.12); filter: brightness(1.25); }
+  }
+  .sp-title {
+    margin-top: 10px;
+    font-size: 22px; font-weight: 900; letter-spacing: 4px;
+    background: linear-gradient(90deg, #ff7ab0, #ff1a5c, #f0c36a, #ff7ab0);
+    background-size: 200% auto;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: shine 2.5s linear infinite;
+  }
+  @keyframes shine {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+  .sp-lines {
+    margin-top: 18px;
+    width: 100%; max-width: 360px;
+    text-align: center;
+  }
+  .sp-line {
+    font-size: 13px;
+    line-height: 1.7;
+    color: #ffc2d6;
+    opacity: 0;
+    transform: translateY(12px);
+    animation: lineIn .7s ease forwards;
+    margin: 6px 0;
+    text-shadow: 0 0 10px rgba(255, 50, 110, .35);
+  }
+  @keyframes lineIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .sp-bar-wrap {
+    margin-top: 22px;
+    width: min(260px, 70vw);
+    height: 6px;
+    border-radius: 99px;
+    background: rgba(255,255,255,.1);
+    overflow: hidden;
+  }
+  .sp-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ff1a5c, #f0c36a, #c9a6ff);
+    border-radius: 99px;
+    transition: width .05s linear;
+  }
+  .sp-hint {
+    margin-top: 14px;
+    font-size: 11px;
+    color: #b88a9c;
+    letter-spacing: 1px;
+  }
+  .sp-skip {
+    margin-top: 16px;
+    border: 1px solid rgba(255, 100, 150, .4);
+    background: rgba(0,0,0,.35);
+    color: #ffb0c8;
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .fx { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .fx span {
+    position: absolute; font-size: 14px; opacity: .2;
+    animation: up linear infinite; color: #ff7ab0;
+  }
+  @keyframes up {
+    0% { transform: translateY(105vh); opacity: 0; }
+    15% { opacity: .25; }
+    100% { transform: translateY(-10vh); opacity: 0; }
+  }
+
+  .wrap { position: relative; z-index: 1; max-width: 460px; margin: 0 auto; padding: 14px 12px 0; }
+
+  .hero { text-align: center; }
+  .hero h1 {
+    font-size: 22px; letter-spacing: 3px; font-weight: 900;
+    background: linear-gradient(90deg, #ff7ab0, #ff1a5c, #f0c36a, #c9a6ff, #ff7ab0);
+    background-size: 220% auto;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: shine 3.5s linear infinite;
+  }
+  .hero p { margin-top: 6px; font-size: 11px; color: var(--muted); line-height: 1.55; }
+  .pills { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .pill {
+    font-size: 10px; padding: 4px 9px; border-radius: 999px;
+    border: 1px solid rgba(255, 50, 110, .4);
+    background: rgba(255, 30, 80, .12); color: var(--pink2);
+  }
+  .pill.g { border-color: rgba(240,195,106,.4); color: var(--gold); background: rgba(240,195,106,.1); }
+  .pill.s { border-color: rgba(201,166,255,.4); color: #e0d0ff; background: rgba(150,80,255,.12); }
+
+  .dirty-board {
+    margin-top: 12px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: rgba(0,0,0,.35);
+    padding: 10px 12px;
+    font-size: 12px;
+    color: #ffc0d4;
+    line-height: 1.65;
+    min-height: 52px;
+  }
+
+  .card {
+    margin-top: 12px;
+    background: linear-gradient(165deg, rgba(255,30,90,.12), rgba(12,0,18,.9));
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 13px;
+  }
+  .card h2 {
+    font-size: 11px; letter-spacing: 2px; color: var(--pink2); margin-bottom: 9px;
+  }
+
+  .mirrors { display: flex; flex-direction: column; gap: 7px; }
+  .mirror {
+    display: flex; gap: 10px; align-items: center;
+    padding: 11px; border-radius: 12px;
+    background: rgba(0,0,0,.35); border: 1px solid transparent; cursor: pointer;
+  }
+  .mirror.active {
+    border-color: rgba(240,195,106,.5);
+    background: linear-gradient(90deg, rgba(240,195,106,.12), rgba(255,40,100,.12));
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #555; }
+  .dot.ok { background: #3dff9a; box-shadow: 0 0 8px #3dff9a; }
+  .dot.bad { background: #ff4d6d; }
+  .dot.load { background: #aaa; }
+  .mirror .name { font-size: 13px; font-weight: 700; }
+  .mirror .url { font-size: 10px; color: var(--muted); }
+
+  .btn {
+    width: 100%; border: none; cursor: pointer; border-radius: 13px;
+    padding: 13px; font-size: 14px; font-weight: 800; color: #fff;
+  }
+  .btn-main {
+    margin-top: 11px;
+    background: linear-gradient(105deg, #ff1a5c, #b44dff, #f0c36a, #ff1a5c);
+    background-size: 220% auto;
+    animation: shine 2.8s linear infinite;
+    box-shadow: 0 10px 26px rgba(255,40,100,.4);
+  }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 8px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 8px; }
+  .btn-hot {
+    background: linear-gradient(135deg, rgba(255,40,100,.4), rgba(150,70,255,.25));
+    border: 1px solid rgba(255,120,170,.45); color: #fff; font-size: 12px; padding: 11px;
+  }
+  .btn-ghost {
+    background: rgba(255,255,255,.05); border: 1px solid var(--line);
+    color: var(--text); font-size: 12px; padding: 11px;
+  }
+
+  label { display: block; font-size: 11px; color: var(--muted); margin: 10px 0 6px; }
+  .row { display: flex; gap: 7px; }
+  .field {
+    flex: 1; min-width: 0; background: rgba(0,0,0,.45);
+    border: 1px solid var(--line); border-radius: 12px;
+    color: var(--text); padding: 11px; font-size: 14px; outline: none;
+  }
+  select.field { appearance: none; }
+
+  .quick { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 8px; }
+  .q {
+    text-decoration: none; color: var(--text); text-align: center;
+    padding: 10px 8px; border-radius: 12px; font-size: 11px;
+    background: rgba(0,0,0,.3); border: 1px solid var(--line);
+  }
+
+  .fav {
+    display: flex; gap: 8px; align-items: center;
+    padding: 9px 10px; border-radius: 12px; margin-top: 7px;
+    background: rgba(0,0,0,.28); border: 1px solid var(--line);
+  }
+  .fav .t { flex: 1; font-size: 12px; font-weight: 600; }
+  .fav .s { font-size: 10px; color: var(--muted); }
+  .icon-btn {
+    width: 34px; height: 34px; border-radius: 10px;
+    border: 1px solid var(--line); background: transparent; color: var(--pink2); cursor: pointer;
+  }
+
+  .log {
+    margin-top: 9px; font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 10px; color: var(--muted); background: rgba(0,0,0,.4);
+    border-radius: 12px; border: 1px solid var(--line);
+    padding: 8px 10px; max-height: 90px; overflow: auto; white-space: pre-wrap;
+  }
+  .footer {
+    text-align: center; margin-top: 12px; font-size: 10px; color: var(--muted); line-height: 1.55;
+  }
+  .toast {
+    position: fixed; left: 50%; bottom: calc(16px + var(--safe-b));
+    transform: translateX(-50%) translateY(12px);
+    background: #160012; color: #fff; border: 1px solid rgba(255,50,110,.5);
+    padding: 9px 14px; border-radius: 999px; font-size: 12px;
+    opacity: 0; pointer-events: none; transition: .25s; z-index: 50;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+  <!-- 开屏：≥3秒，淫语 -->
+  <div id="splash">
+    <div class="sp-spade">♠</div>
+    <div class="sp-title">MEIMO 肉欲舱</div>
+    <div class="sp-lines" id="spLines"></div>
+    <div class="sp-bar-wrap"><div class="sp-bar" id="spBar"></div></div>
+    <div class="sp-hint" id="spHint">正在把你的理智脱光…</div>
+    <button class="sp-skip" id="spSkip" type="button">受不了了，直接进舱</button>
+  </div>
+
+  <div class="fx" id="fx"></div>
+
+  <div class="wrap">
+    <header class="hero">
+      <h1>♠ MEIMO 肉欲启动舱</h1>
+      <p>黑桃印记 · 多镜像 · 深链直达 · 淫语轮播<br/>点按钮会真正打开系统浏览器</p>
+      <div class="pills">
+        <span class="pill">18+</span>
+        <span class="pill s">♠ 性奴暗号</span>
+        <span class="pill g" id="mirrorBadge">镜像检测中</span>
+        <span class="pill" id="modeBadge">浏览器</span>
+      </div>
+    </header>
+
+    <div class="dirty-board" id="dirtyBoard">加载骚话中…</div>
+
+    <section class="card">
+      <h2>♠ 账号保险柜（仅存本机）</h2>
+      <p style="font-size:10px;color:#c49aab;line-height:1.5;margin-bottom:8px;">明文保存在浏览器 localStorage，不上传。换机/清数据会丢。勿把本文件分享给他人。</p>
+      <label>邮箱 / 账号</label>
+      <input class="field" id="accUser" placeholder="例如 xxx@qq.com" style="width:100%;margin-bottom:8px" />
+      <label>密码</label>
+      <div class="row">
+        <input class="field" id="accPass" type="password" placeholder="密码" />
+        <button class="btn btn-ghost" id="btnTogglePass" type="button" style="width:auto;padding:0 12px">显示</button>
+      </div>
+      <div class="grid2" style="margin-top:8px">
+        <button class="btn btn-hot" id="btnSaveAcc" type="button">保存到本机</button>
+        <button class="btn btn-hot" id="btnFillCopy" type="button">复制账号密码</button>
+        <button class="btn btn-ghost" id="btnOpenLoginFill" type="button">打开登录页</button>
+        <button class="btn btn-ghost" id="btnClearAcc" type="button">清除账号</button>
+      </div>
+      <div style="font-size:10px;color:#b88a9c;margin-top:8px;line-height:1.5" id="accStatus">未保存账号</div>
+    </section>
+
+    <section class="card">
+      <h2>♠ 镜像通道</h2>
+      <div class="mirrors" id="mirrorList"></div>
+      <button class="btn btn-main" id="btnLaunch" type="button">🔥 操进 MEIMO 主站</button>
+      <div class="grid2">
+        <button class="btn btn-hot" id="btnLogin" type="button">💋 登录泄欲</button>
+        <button class="btn btn-hot" id="btnChat" type="button">⛓ 聊天调教</button>
+        <button class="btn btn-ghost" id="btnHome" type="button">首页</button>
+        <button class="btn btn-ghost" id="btnMe" type="button">电量 / 我的</button>
+      </div>
+      <div class="grid3">
+        <button class="btn btn-ghost" id="btnSearch" type="button">搜索</button>
+        <button class="btn btn-ghost" id="btnRank" type="button">排行</button>
+        <button class="btn btn-ghost" id="btnCreate" type="button">创建卡</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>♠ 角色深链 / 批量工具</h2>
+      <label>角色 ID（可逗号分隔多个，依次打开）</label>
+      <div class="row">
+        <input class="field" id="roleId" placeholder="如 338277,184430" />
+        <button class="btn btn-hot" id="btnRole" type="button" style="width:auto;padding:0 12px">打开</button>
+      </div>
+      <label>自定义路径（拼在当前镜像后）</label>
+      <div class="row">
+        <input class="field" id="customPath" placeholder="/#/pages/..." />
+        <button class="btn btn-ghost" id="btnCustom" type="button" style="width:auto;padding:0 12px">走</button>
+      </div>
+      <label>一键场景</label>
+      <div class="grid2">
+        <button class="btn btn-hot" id="btnWallet" type="button">⚡ 钱包电量</button>
+        <button class="btn btn-hot" id="btnNewChat" type="button">💬 会话列表</button>
+        <button class="btn btn-ghost" id="btnForceChrome" type="button">外部浏览器强开</button>
+        <button class="btn btn-ghost" id="btnVibrate" type="button">震动测试</button>
+      </div>
+      <div class="log" id="log">肉欲舱就绪。</div>
+    </section>
+
+    <section class="card">
+      <h2>♠ 收藏玩物</h2>
+      <div id="favBox"></div>
+      <div class="row" style="margin-top:8px">
+        <input class="field" id="favId" inputmode="numeric" placeholder="ID" />
+        <input class="field" id="favName" placeholder="备注骚名" />
+        <button class="btn btn-ghost" id="btnAddFav" type="button" style="width:auto;padding:0 12px">锁</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>♠ 高级</h2>
+      <div class="grid2">
+        <button class="btn btn-ghost" id="btnPing" type="button">探测全部镜像</button>
+        <button class="btn btn-ghost" id="btnCopy" type="button">复制当前入口</button>
+        <button class="btn btn-ghost" id="btnCopyRole" type="button">复制角色链接</button>
+        <button class="btn btn-ghost" id="btnReplaySplash" type="button">重看开屏淫语</button>
+        <button class="btn btn-ghost" id="btnExportFav" type="button">导出收藏JSON</button>
+        <button class="btn btn-ghost" id="btnImportFav" type="button">导入收藏JSON</button>
+        <button class="btn btn-ghost" id="btnClear" type="button">清空收藏</button>
+        <button class="btn btn-ghost" id="btnClearLog" type="button">清空日志</button>
+      </div>
+      <input type="file" id="importFile" accept="application/json,.json" style="display:none" />
+    </section>
+
+    <p class="footer">
+      18+ 本地启动舱 · 不保存账号密码<br/>
+      开屏淫语仅氛围装饰 · 站点跳转至 Meimo 镜像
+    </p>
+  </div>
+  <div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  const MIRRORS = [
+    { id: '14', name: 'Meimo 14 · 主穴', host: 'https://www.meimoai14.com' },
+    { id: '14b', name: 'Meimo 14 · 备用洞', host: 'https://meimoai14.com' },
+    { id: '15', name: 'Meimo 15', host: 'https://www.meimoai15.com' },
+    { id: '13', name: 'Meimo 13', host: 'https://www.meimoai13.com' },
+    { id: '12', name: 'Meimo 12', host: 'https://www.meimoai12.com' },
+  ];
+  const PATHS = {
+    home: '/#/',
+    login: '/#/pages/login/login',
+    chat: '/#/pages/chat/index',
+    me: '/#/pages/ucenter/index',
+    search: '/#/pages/search/search',
+    rank: '/#/pages/rank/rank',
+    create: '/#/pages/role/create',
+    wallet: '/#/pages/wallet/wallet',
+    role: (id) => `/#/pages/role/detail?id=${encodeURIComponent(id)}`,
+  };
+
+  const DIRTY = [
+    '把脸埋进去之前，先选好今晚要操开的卡。',
+    '黑桃只是暗号——真正湿的是你点进去的那句对话。',
+    '电量不够？那就边射边充，别装纯。',
+    '她让你跪，你就报自己的角色 ID。',
+    '嘴巴空着很浪费，去聊天页找个洞填上。',
+    '收藏不是爱，是方便下次继续骑。',
+    '登录吧，匿名的骚只配边缘摩擦。',
+    '今晚不谈恋爱，只谈插入、吞吐和臣服。',
+    '镜像能换，下贱的习惯换不了。',
+    '点开主站，像扯开那层最后的布。',
+  ];
+
+  const SPLASH_LINES = [
+    '腿张开。不是商量，是入场须知。',
+    '今晚你不是来浏览的，是来被写进状态栏的。',
+    '口穴、胸前、腿心——先挑一个交给对话。',
+    '黑桃印在心里：♠ 表示你同意被使用。',
+    '射太快也没关系，重新进卡继续挨操。',
+    '三秒够硬了吗？不够就再看一遍开屏。',
+  ];
+
+  const $ = (s) => document.querySelector(s);
+  let active = localStorage.getItem('meimo_ultra_mirror') || '14';
+  let favs = [];
+  try { favs = JSON.parse(localStorage.getItem('meimo_ultra_favs') || '[]'); } catch (_) {}
+
+  function log(msg) {
+    const t = new Date().toLocaleTimeString();
+    $('#log').textContent = `[${t}] ${msg}\n` + ($('#log').textContent || '').slice(0, 700);
+  }
+  function toast(msg) {
+    const el = $('#toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 1600);
+  }
+  function getMirror() {
+    return MIRRORS.find((m) => m.id === active) || MIRRORS[0];
+  }
+
+  function openInBrowser(path, opts) {
+    const base = getMirror().host.replace(/\/$/, '');
+    const url = path ? (path.startsWith('http') ? path : base + path) : base + '/';
+    log('插入通道 → ' + url);
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => a.remove(), 60);
+    try {
+      const w = window.open(url, '_blank');
+      if (!w && opts && opts.force) window.location.href = url;
+      else if (!w) window.location.href = url;
+    } catch (_) {
+      window.location.href = url;
+    }
+    toast('已操进系统浏览器');
+    if (navigator.vibrate) navigator.vibrate(30);
+  }
+
+  /* splash ≥ 3s */
+  let splashTimer = null;
+  let splashStart = 0;
+  const SPLASH_MS = 3800;
+
+  function playSplash() {
+    const splash = $('#splash');
+    const lines = $('#spLines');
+    const bar = $('#spBar');
+    splash.classList.remove('hide');
+    lines.innerHTML = '';
+    SPLASH_LINES.forEach((text, i) => {
+      const d = document.createElement('div');
+      d.className = 'sp-line';
+      d.textContent = text;
+      d.style.animationDelay = (0.25 + i * 0.45) + 's';
+      lines.appendChild(d);
+    });
+    splashStart = Date.now();
+    bar.style.width = '0%';
+    if (splashTimer) cancelAnimationFrame(splashTimer);
+    function tick() {
+      const p = Math.min(1, (Date.now() - splashStart) / SPLASH_MS);
+      bar.style.width = (p * 100).toFixed(1) + '%';
+      if (p >= 1) {
+        closeSplash();
+        return;
+      }
+      splashTimer = requestAnimationFrame(tick);
+    }
+    splashTimer = requestAnimationFrame(tick);
+  }
+
+  function closeSplash() {
+    const elapsed = Date.now() - splashStart;
+    const left = Math.max(0, 3000 - elapsed);
+    setTimeout(() => {
+      $('#splash').classList.add('hide');
+    }, left);
+  }
+
+  $('#spSkip').onclick = () => {
+    const elapsed = Date.now() - splashStart;
+    if (elapsed < 3000) {
+      toast('至少再浪 ' + Math.ceil((3000 - elapsed) / 1000) + ' 秒');
+      return;
+    }
+    $('#splash').classList.add('hide');
+  };
+
+  function renderMirrors() {
+    const box = $('#mirrorList');
+    box.innerHTML = '';
+    MIRRORS.forEach((m) => {
+      const el = document.createElement('div');
+      el.className = 'mirror' + (m.id === active ? ' active' : '');
+      el.innerHTML = `<div class="dot load" data-s="${m.id}"></div>
+        <div style="flex:1;min-width:0"><div class="name">${m.name}</div><div class="url">${m.host}</div></div>`;
+      el.onclick = () => {
+        active = m.id;
+        localStorage.setItem('meimo_ultra_mirror', active);
+        $('#mirrorBadge').textContent = m.name;
+        renderMirrors();
+        log('换洞 → ' + m.host);
+      };
+      box.appendChild(el);
+    });
+    $('#mirrorBadge').textContent = getMirror().name;
+  }
+
+  function renderFavs() {
+    const box = $('#favBox');
+    if (!favs.length) {
+      box.innerHTML = '<div style="font-size:11px;color:var(--muted);text-align:center;padding:8px">还没有锁进舱的玩物</div>';
+      return;
+    }
+    box.innerHTML = '';
+    favs.forEach((f, i) => {
+      const el = document.createElement('div');
+      el.className = 'fav';
+      el.innerHTML = `<div><div class="t">♠ ${f.name || f.id}</div><div class="s">ID ${f.id}</div></div>
+        <button class="icon-btn" type="button">↗</button>
+        <button class="icon-btn" type="button">×</button>`;
+      const btns = el.querySelectorAll('.icon-btn');
+      btns[0].onclick = () => openInBrowser(PATHS.role(f.id));
+      btns[1].onclick = () => {
+        favs.splice(i, 1);
+        localStorage.setItem('meimo_ultra_favs', JSON.stringify(favs));
+        renderFavs();
+      };
+      box.appendChild(el);
+    });
+  }
+
+  async function ping() {
+    log('探测所有肉穴镜像…');
+    for (const m of MIRRORS) {
+      const d = document.querySelector(`[data-s="${m.id}"]`);
+      if (d) d.className = 'dot load';
+      const c = new AbortController();
+      const t = setTimeout(() => c.abort(), 4000);
+      try {
+        await fetch(m.host + '/?_=' + Date.now(), { mode: 'no-cors', cache: 'no-store', signal: c.signal });
+        clearTimeout(t);
+        if (d) d.className = 'dot ok';
+        log(m.name + ' 可插入');
+      } catch (_) {
+        clearTimeout(t);
+        if (d) d.className = 'dot bad';
+        log(m.name + ' 超时');
+      }
+    }
+    toast('探测完了');
+  }
+
+  function spawnFx() {
+    const box = $('#fx');
+    const marks = ['♠', '💦', '⛓', '🔞', '💋', '🗝', '♥'];
+    for (let i = 0; i < 24; i++) {
+      const s = document.createElement('span');
+      s.textContent = marks[i % marks.length];
+      s.style.left = Math.random() * 100 + '%';
+      s.style.animationDuration = 7 + Math.random() * 12 + 's';
+      s.style.animationDelay = Math.random() * 8 + 's';
+      box.appendChild(s);
+    }
+  }
+
+  let dirtyIdx = 0;
+  function rotateDirty() {
+    $('#dirtyBoard').textContent = '💦 ' + DIRTY[dirtyIdx % DIRTY.length];
+    dirtyIdx++;
+  }
+
+  
+  // account vault (local only)
+  function loadAcc() {
+    try {
+      const raw = localStorage.getItem('meimo_ultra_acc');
+      if (!raw) { $('#accStatus').textContent = '未保存账号'; return; }
+      const o = JSON.parse(raw);
+      if (o.user) $('#accUser').value = o.user;
+      if (o.pass) $('#accPass').value = o.pass;
+      $('#accStatus').textContent = '已保存：' + (o.user || '') + '（仅本机）';
+    } catch (_) {
+      $('#accStatus').textContent = '读取失败';
+    }
+  }
+  $('#btnTogglePass').onclick = () => {
+    const el = $('#accPass');
+    if (el.type === 'password') { el.type = 'text'; $('#btnTogglePass').textContent = '隐藏'; }
+    else { el.type = 'password'; $('#btnTogglePass').textContent = '显示'; }
+  };
+  $('#btnSaveAcc').onclick = () => {
+    const user = ($('#accUser').value || '').trim();
+    const pass = $('#accPass').value || '';
+    if (!user || !pass) return toast('账号密码都要填');
+    localStorage.setItem('meimo_ultra_acc', JSON.stringify({ user, pass, ts: Date.now() }));
+    $('#accStatus').textContent = '已保存：' + user + '（仅本机）';
+    toast('已写入本机保险柜');
+    log('账号已本地保存（明文）');
+  };
+  $('#btnFillCopy').onclick = async () => {
+    const user = ($('#accUser').value || '').trim();
+    const pass = $('#accPass').value || '';
+    if (!user || !pass) return toast('没有可复制的账号');
+    const text = user + '\\n' + pass;
+    try {
+      await navigator.clipboard.writeText(text);
+      toast('账号密码已复制，去登录页粘贴');
+    } catch {
+      prompt('账号', user);
+      prompt('密码', pass);
+    }
+  };
+  $('#btnOpenLoginFill').onclick = () => {
+    openInBrowser(PATHS.login);
+    setTimeout(() => {
+      toast('请在登录页粘贴刚复制的账号密码');
+    }, 400);
+  };
+  $('#btnClearAcc').onclick = () => {
+    if (!confirm('清除本机保存的账号密码？')) return;
+    localStorage.removeItem('meimo_ultra_acc');
+    $('#accUser').value = '';
+    $('#accPass').value = '';
+    $('#accStatus').textContent = '未保存账号';
+    toast('已清除');
+  };
+  loadAcc();
+
+
+  // binds
+  $('#btnLaunch').onclick = () => openInBrowser(PATHS.home);
+  $('#btnLogin').onclick = () => openInBrowser(PATHS.login);
+  $('#btnChat').onclick = () => openInBrowser(PATHS.chat);
+  $('#btnHome').onclick = () => openInBrowser(PATHS.home);
+  $('#btnMe').onclick = () => openInBrowser(PATHS.me);
+  $('#btnSearch').onclick = () => openInBrowser(PATHS.search);
+  $('#btnRank').onclick = () => openInBrowser(PATHS.rank);
+  $('#btnCreate').onclick = () => openInBrowser(PATHS.create);
+  $('#btnWallet').onclick = () => openInBrowser(PATHS.wallet);
+  $('#btnNewChat').onclick = () => openInBrowser(PATHS.chat);
+  $('#btnForceChrome').onclick = () => openInBrowser(PATHS.home, { force: true });
+  $('#btnVibrate').onclick = () => {
+    if (navigator.vibrate) {
+      navigator.vibrate([40, 60, 40, 60, 80]);
+      toast('震动已射一发');
+    } else toast('这台设备不支持震动');
+  };
+  $('#btnRole').onclick = () => {
+    const raw = ($('#roleId').value || '').trim();
+    const ids = raw.split(/[,，\s]+/).map((s) => s.trim()).filter((s) => /^\d+$/.test(s));
+    if (!ids.length) return toast('填数字 ID');
+    ids.forEach((id, i) => setTimeout(() => openInBrowser(PATHS.role(id)), i * 400));
+  };
+  $('#btnCustom').onclick = () => {
+    let p = ($('#customPath').value || '').trim();
+    if (!p) return toast('填路径');
+    if (!p.startsWith('/')) p = '/' + p;
+    openInBrowser(p);
+  };
+  $('#btnAddFav').onclick = () => {
+    const id = ($('#favId').value || '').trim();
+    const name = ($('#favName').value || '').trim();
+    if (!/^\d+$/.test(id)) return toast('ID 必须是数字');
+    if (favs.some((f) => f.id === id)) return toast('已经锁过了');
+    favs.unshift({ id, name: name || id });
+    localStorage.setItem('meimo_ultra_favs', JSON.stringify(favs));
+    $('#favId').value = '';
+    $('#favName').value = '';
+    renderFavs();
+    toast('已上锁');
+  };
+  $('#btnPing').onclick = ping;
+  $('#btnCopy').onclick = async () => {
+    try {
+      await navigator.clipboard.writeText(getMirror().host);
+      toast('入口已复制');
+    } catch {
+      prompt('复制', getMirror().host);
+    }
+  };
+  $('#btnCopyRole').onclick = async () => {
+    const id = ($('#roleId').value || '').trim().split(/[,，\s]+/)[0];
+    if (!/^\d+$/.test(id)) return toast('先填一个角色 ID');
+    const url = getMirror().host.replace(/\/$/, '') + PATHS.role(id);
+    try {
+      await navigator.clipboard.writeText(url);
+      toast('角色链已复制');
+    } catch {
+      prompt('复制', url);
+    }
+  };
+  $('#btnReplaySplash').onclick = () => playSplash();
+  $('#btnExportFav').onclick = () => {
+    const blob = new Blob([JSON.stringify(favs, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'meimo-favs.json';
+    a.click();
+    toast('已导出');
+  };
+  $('#btnImportFav').onclick = () => $('#importFile').click();
+  $('#importFile').onchange = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if (!Array.isArray(data)) throw new Error('格式不对');
+      favs = data.filter((x) => x && /^\d+$/.test(String(x.id))).map((x) => ({ id: String(x.id), name: x.name || String(x.id) }));
+      localStorage.setItem('meimo_ultra_favs', JSON.stringify(favs));
+      renderFavs();
+      toast('导入成功');
+    } catch (_) {
+      toast('导入失败');
+    }
+    e.target.value = '';
+  };
+  $('#btnClear').onclick = () => {
+    if (!confirm('清空收藏？')) return;
+    favs = [];
+    localStorage.removeItem('meimo_ultra_favs');
+    renderFavs();
+  };
+  $('#btnClearLog').onclick = () => { $('#log').textContent = '日志已清空'; };
+
+  if (!favs.length) {
+    favs = [
+      { id: '338277', name: '金主线' },
+      { id: '184430', name: '184430' },
+    ];
+    localStorage.setItem('meimo_ultra_favs', JSON.stringify(favs));
+  }
+
+  spawnFx();
+  renderMirrors();
+  renderFavs();
+  rotateDirty();
+  setInterval(rotateDirty, 4200);
+  setTimeout(ping, 300);
+  playSplash();
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(function(){});
+  }
+})();
+</script>
+</body>
+</html>
